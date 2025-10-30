@@ -1,0 +1,319 @@
+:root {
+  --primary: #f26722;
+  --secondary: #333333;
+  --bg-light: #f8fafc;
+  --card-bg: #ffffff;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.editowner__container {
+  min-height: calc(100vh - 70px);
+  background-color: var(--bg-light);
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.editowner__wrapper {
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== HEADER ==================== */
+.editowner__header {
+  padding: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.editowner__back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-size: 0.9375rem;
+  transition: var(--transition);
+}
+
+.editowner__back-btn:hover {
+  color: #e55a24;
+  gap: 0.75rem;
+}
+
+.editowner__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.editowner__subtitle {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ==================== FORM ==================== */
+.editowner__form {
+  padding: 2rem;
+}
+
+.editowner__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ==================== FORM GROUP ==================== */
+.editowner__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editowner__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* ==================== INPUT ==================== */
+.editowner__input {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition);
+  background-color: var(--bg-light);
+}
+
+.editowner__input:focus {
+  border-color: var(--primary);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(242, 103, 34, 0.1);
+}
+
+.editowner__input::placeholder {
+  color: var(--text-muted);
+}
+
+.editowner__input[readonly] {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  color: var(--text-muted);
+}
+
+/* ==================== FILE INPUT ==================== */
+.editowner__file-input {
+  cursor: pointer;
+}
+
+.editowner__file-hidden {
+  display: none;
+}
+
+.editowner__file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.editowner__file-label:hover {
+  border-color: var(--primary);
+  background-color: rgba(242, 103, 34, 0.05);
+  color: var(--primary);
+}
+
+.editowner__image-preview {
+  width: 100%;
+  height: 200px;
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background-color: var(--bg-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editowner__image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==================== ACTIONS ==================== */
+.editowner__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.editowner__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.editowner__btn--primary {
+  background: linear-gradient(135deg, var(--primary), #e55a24);
+  color: white;
+  box-shadow: 0 2px 8px rgba(242, 103, 34, 0.2);
+}
+
+.editowner__btn--primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(242, 103, 34, 0.3);
+}
+
+.editowner__btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.editowner__btn--secondary {
+  background-color: transparent;
+  color: var(--text-dark);
+  border: 1.5px solid var(--border);
+}
+
+.editowner__btn--secondary:hover {
+  border-color: var(--primary);
+  background-color: var(--bg-light);
+  color: var(--primary);
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .editowner__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .editowner__wrapper {
+    margin: 1rem;
+    border-radius: 10px;
+  }
+
+  .editowner__header {
+    padding: 1.5rem;
+  }
+
+  .editowner__form {
+    padding: 1.5rem;
+  }
+
+  .editowner__back-btn {
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  .editowner__title {
+    font-size: 1.5rem;
+  }
+
+  .editowner__grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .editowner__actions {
+    flex-direction: column;
+  }
+
+  .editowner__btn {
+    width: 100%;
+  }
+
+  .editowner__image-preview {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .editowner__wrapper {
+    margin: 0.75rem;
+  }
+
+  .editowner__header {
+    padding: 1.25rem;
+  }
+
+  .editowner__form {
+    padding: 1.25rem;
+  }
+
+  .editowner__back-btn {
+    font-size: 0.875rem;
+  }
+
+  .editowner__title {
+    font-size: 1.25rem;
+  }
+
+  .editowner__file-label {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .editowner__image-preview {
+    height: 120px;
+  }
+
+  .editowner__btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}
