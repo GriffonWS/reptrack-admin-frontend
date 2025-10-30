@@ -3,20 +3,15 @@ import { FiArrowLeft, FiUpload, FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import "./EditAdminProfile.css";
 import Loader from "../../../components/Loader/Loader";
+import { getAdminByToken, updateAdminByToken } from "../../../services/auth/authService";
 
 const EditAdminProfile = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    adminName: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    phoneNumber: "",
     role: "",
-    department: "",
-    profileImage: "",
-  });
-
-  const [preview, setPreview] = useState({
-    profileImage: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -29,35 +24,19 @@ const EditAdminProfile = () => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
+        const response = await getAdminByToken();
 
-        // TODO: Replace with actual API call to fetch admin profile
-        // const response = await getAdminByToken();
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Mock data for testing
-        const mockData = {
-          adminName: "Admin User",
-          email: "admin@reptrack.com",
-          phoneNumber: "+1 (555) 999-8888",
-          role: "Super Administrator",
-          department: "Management",
-          profileImage: null,
-        };
-
-        setFormData({
-          adminName: mockData.adminName || "",
-          email: mockData.email || "",
-          phoneNumber: mockData.phoneNumber || "",
-          role: mockData.role || "",
-          department: mockData.department || "",
-          profileImage: mockData.profileImage || "",
-        });
-
-        setPreview({
-          profileImage: mockData.profileImage || "",
-        });
+        if (response.success && response.data) {
+          const data = response.data;
+          setFormData({
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
+            email: data.email || "",
+            role: data.role || "admin",
+          });
+        } else {
+          setError("Failed to load profile data.");
+        }
       } catch (err) {
         setError(err.message || "Failed to load profile data.");
       } finally {
@@ -72,15 +51,6 @@ const EditAdminProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle file uploads
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    const file = files[0];
-    if (file) {
-      setFormData({ ...formData, [name]: file });
-      setPreview({ ...preview, [name]: URL.createObjectURL(file) });
-    }
-  };
 
   // ✅ Save updates
   const handleSubmit = async (e) => {
@@ -90,29 +60,22 @@ const EditAdminProfile = () => {
     setSuccess("");
 
     try {
-      const updatedForm = new FormData();
+      // Backend only allows firstName and lastName to be updated
+      const updatedData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      };
 
-      // ⚠️ IMPORTANT: Append ALL text fields (backend expects them)
-      updatedForm.append("adminName", formData.adminName || "");
-      updatedForm.append("phoneNumber", formData.phoneNumber || "");
-      updatedForm.append("department", formData.department || "");
+      const response = await updateAdminByToken(updatedData);
 
-      // Append file only if it is a new File object
-      if (formData.profileImage instanceof File) {
-        updatedForm.append("profile_image", formData.profileImage);
+      if (response.success) {
+        setSuccess("Profile updated successfully!");
+        setTimeout(() => {
+          navigate("/dashboard/profile");
+        }, 2000);
+      } else {
+        setError(response.message || "Failed to update profile.");
       }
-
-      // TODO: Replace with actual API call to update admin profile
-      // const response = await updateAdmin(updatedForm);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setSuccess("Profile updated successfully!");
-
-      setTimeout(() => {
-        navigate("/dashboard/profile");
-      }, 2000);
     } catch (err) {
       setError(err.message || "Failed to update profile.");
     } finally {
@@ -155,50 +118,37 @@ const EditAdminProfile = () => {
         )}
 
         <form className="editprofile__form-wrapper" onSubmit={handleSubmit}>
-          {/* Image Section */}
-          <div className="editprofile__image-section">
-            <div className="editprofile__image-group">
-              <div className="editprofile__avatar">
-                {preview.profileImage ? (
-                  <img src={preview.profileImage} alt="Profile" />
-                ) : (
-                  <FiUser size={48} />
-                )}
-              </div>
-              <div>
-                <label className="editprofile__upload-btn">
-                  <FiUpload size={18} />
-                  Upload Profile Image
-                  <input
-                    type="file"
-                    name="profileImage"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="editprofile__file-input"
-                  />
-                </label>
-                <p className="editprofile__upload-hint">JPG, PNG up to 5MB</p>
-              </div>
-            </div>
-          </div>
-
           {/* Form Grid */}
           <div className="editprofile__form-grid">
-            {/* Admin Name */}
+            {/* First Name */}
             <div className="editprofile__form-group">
-              <label className="editprofile__label">Full Name *</label>
+              <label className="editprofile__label">First Name *</label>
               <input
                 type="text"
-                name="adminName"
-                value={formData.adminName}
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleChange}
                 className="editprofile__input"
-                placeholder="Enter your full name"
+                placeholder="Enter first name"
                 required
               />
             </div>
 
-            {/* Email */}
+            {/* Last Name */}
+            <div className="editprofile__form-group">
+              <label className="editprofile__label">Last Name *</label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className="editprofile__input"
+                placeholder="Enter last name"
+                required
+              />
+            </div>
+
+            {/* Email (Read-only) */}
             <div className="editprofile__form-group">
               <label className="editprofile__label">Email</label>
               <input
@@ -209,20 +159,7 @@ const EditAdminProfile = () => {
               />
             </div>
 
-            {/* Phone Number */}
-            <div className="editprofile__form-group">
-              <label className="editprofile__label">Phone Number</label>
-              <input
-                type="text"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="editprofile__input"
-                placeholder="Enter phone number"
-              />
-            </div>
-
-            {/* Role */}
+            {/* Role (Read-only) */}
             <div className="editprofile__form-group">
               <label className="editprofile__label">Role</label>
               <input
@@ -230,19 +167,6 @@ const EditAdminProfile = () => {
                 value={formData.role}
                 disabled
                 className="editprofile__input"
-              />
-            </div>
-
-            {/* Department */}
-            <div className="editprofile__form-group">
-              <label className="editprofile__label">Department</label>
-              <input
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                className="editprofile__input"
-                placeholder="Enter department"
               />
             </div>
           </div>

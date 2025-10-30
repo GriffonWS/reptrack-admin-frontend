@@ -241,6 +241,33 @@
           color: var(--primary);
         }
 
+        .adduser__btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        /* ==================== ERROR & SUCCESS MESSAGES ==================== */
+        .adduser__error-message {
+          padding: 1rem 1.5rem;
+          background-color: #fee;
+          border: 1px solid #fcc;
+          border-radius: 8px;
+          color: #c33;
+          font-size: 0.9375rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .adduser__success-message {
+          padding: 1rem 1.5rem;
+          background-color: #efe;
+          border: 1px solid #cfc;
+          border-radius: 8px;
+          color: #3c3;
+          font-size: 0.9375rem;
+          margin-bottom: 1.5rem;
+        }
+
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 768px) {
           

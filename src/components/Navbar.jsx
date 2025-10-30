@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch, FiBell, FiChevronDown, FiUser, FiLock, FiLogOut, FiX, FiEye, FiEyeOff } from 'react-icons/fi';
 import { HiOutlineMenu } from 'react-icons/hi';
+import { removeToken } from '../utils/token';
+import { getAdminByToken, changePassword as changePasswordAPI, logout as logoutAPI } from '../services/auth/authService';
 
 const Navbar = ({ toggleSidebar, sidebarOpen }) => {
   const navigate = useNavigate();
@@ -16,19 +18,15 @@ const Navbar = ({ toggleSidebar, sidebarOpen }) => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
-  const [adminData, setAdminData] = useState({ name: 'Admin User' });
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [adminData, setAdminData] = useState(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState('');
   const dropdownRef = useRef(null);
 
-  // Get initials from admin name
-  const getInitials = (name) => {
-    if (!name) return 'AD';
-    const names = name.trim().split(' ');
-    if (names.length === 1) {
-      return names[0].substring(0, 2).toUpperCase();
-    }
-    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
-  };
+  // Fetch admin data on mount
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -39,6 +37,45 @@ const Navbar = ({ toggleSidebar, sidebarOpen }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const fetchAdminData = async () => {
+    try {
+      setIsLoadingProfile(true);
+      setProfileError('');
+      const response = await getAdminByToken();
+
+      if (response.success && response.data) {
+        setAdminData(response.data);
+      } else {
+        setProfileError('Failed to load profile data');
+      }
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+      setProfileError(error.message || 'Failed to load profile');
+
+      // If unauthorized, redirect to login
+      if (error.message.includes('Unauthorized') || error.message.includes('token')) {
+        removeToken();
+        navigate('/login');
+      }
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
+  // Get initials from admin name
+  const getInitials = (firstName, lastName) => {
+    if (!firstName && !lastName) return 'AD';
+    const first = firstName ? firstName[0].toUpperCase() : '';
+    const last = lastName ? lastName[0].toUpperCase() : '';
+    return first + last || 'AD';
+  };
+
+  // Get full name
+  const getFullName = (firstName, lastName) => {
+    if (!firstName && !lastName) return 'Administrator';
+    return `${firstName || ''} ${lastName || ''}`.trim();
+  };
 
   const toggleProfileDropdown = () => {
     setProfileDropdownOpen(!profileDropdownOpen);
@@ -82,24 +119,55 @@ const Navbar = ({ toggleSidebar, sidebarOpen }) => {
       return;
     }
 
-    // TODO: Call API to change password
+    // Call API to change password
     try {
       setIsPasswordLoading(true);
-      // Simulate API call - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setPasswordSuccess('Password updated successfully!');
-      setTimeout(() => {
-        handleCloseModal();
-      }, 2000);
+      const response = await changePasswordAPI({
+        oldPassword,
+        newPassword,
+        confirmNewPassword: confirmPassword,
+      });
+
+      if (response.success) {
+        setPasswordSuccess('Password updated successfully!');
+        setTimeout(() => {
+          handleCloseModal();
+        }, 2000);
+      } else {
+        setPasswordError(response.message || 'Failed to update password');
+      }
     } catch (error) {
-      setPasswordError('Failed to update password');
+      console.error('Error changing password:', error);
+      setPasswordError(error.message || 'Failed to update password');
+
+      // If unauthorized, redirect to login
+      if (error.message.includes('Unauthorized') || error.message.includes('token')) {
+        setTimeout(() => {
+          handleCloseModal();
+          removeToken();
+          navigate('/login');
+        }, 1500);
+      }
     } finally {
       setIsPasswordLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Call API to logout (clear token on server)
+      await logoutAPI();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Continue with logout even if API call fails
+    } finally {
+      // Remove token from localStorage
+      removeToken();
+      // Close dropdown
+      setProfileDropdownOpen(false);
+      // Navigate to login page
+      navigate('/login');
+    }
   };
 
   return (
@@ -127,12 +195,12 @@ const Navbar = ({ toggleSidebar, sidebarOpen }) => {
                   </div>
                 ) : (
                   <div className="navbar__avatar">
-                    {getInitials(adminData?.name)}
+                    {getInitials(adminData?.firstName, adminData?.lastName)}
                   </div>
                 )}
                 <div className="navbar__info">
                   <p className="navbar__name">
-                    {isLoadingProfile ? 'Loading...' : adminData?.name || 'Administrator'}
+                    {isLoadingProfile ? 'Loading...' : getFullName(adminData?.firstName, adminData?.lastName)}
                   </p>
                   <p className="navbar__role">Administrator</p>
                 </div>

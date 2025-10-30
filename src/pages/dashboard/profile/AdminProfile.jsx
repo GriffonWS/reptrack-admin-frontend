@@ -3,6 +3,7 @@ import { FiEdit, FiMail, FiPhone, FiMapPin, FiUser } from 'react-icons/fi';
 import './AdminProfile.css';
 import { Link } from 'react-router-dom';
 import Loader from '../../../components/Loader/Loader';
+import { getAdminByToken } from '../../../services/auth/authService';
 
 const AdminProfile = () => {
   const [profileData, setProfileData] = useState(null);
@@ -13,26 +14,13 @@ const AdminProfile = () => {
     const fetchAdminProfile = async () => {
       try {
         setLoading(true);
+        const response = await getAdminByToken();
 
-        // TODO: Replace with actual API call to fetch admin profile
-        // const response = await getAdminByToken();
-
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Mock data for testing
-        const mockProfile = {
-          adminName: 'Admin User',
-          email: 'admin@reptrack.com',
-          phoneNumber: '+1 (555) 999-8888',
-          role: 'Super Administrator',
-          department: 'Management',
-          joinDate: '2024-01-01',
-          profileImage: null,
-          active: true
-        };
-
-        setProfileData(mockProfile);
+        if (response.success && response.data) {
+          setProfileData(response.data);
+        } else {
+          setError(response.message || 'Failed to fetch profile');
+        }
       } catch (err) {
         setError(err.message || 'An error occurred while fetching profile');
         console.error('Error fetching admin profile:', err);
@@ -68,10 +56,14 @@ const AdminProfile = () => {
     );
   }
 
-  // Avatar
-  const avatarUrl = profileData.profileImage
-    ? profileData.profileImage
-    : `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileData.adminName || 'Admin'}`;
+  // Avatar - Generate initials from first and last name
+  const getInitials = () => {
+    const first = profileData.firstName?.[0] || '';
+    const last = profileData.lastName?.[0] || '';
+    return (first + last).toUpperCase() || 'AD';
+  };
+
+  const fullName = `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim() || 'Admin User';
 
   return (
     <div className="myprofile__wrapper">
@@ -85,10 +77,12 @@ const AdminProfile = () => {
         {/* Header Card */}
         <div className="myprofile__header-card">
           <div className="myprofile__header-content">
-            <img src={avatarUrl} alt="Profile" className="myprofile__avatar" />
+            <div className="myprofile__avatar">
+              {getInitials()}
+            </div>
             <div className="myprofile__header-info">
-              <h2 className="myprofile__header-name">{profileData.adminName}</h2>
-              <p className="myprofile__header-role">{profileData.role}</p>
+              <h2 className="myprofile__header-name">{fullName}</h2>
+              <p className="myprofile__header-role">{profileData.role || 'Administrator'}</p>
               <div className="myprofile__header-location">
                 <FiMail size={16} />
                 <span>{profileData.email}</span>
@@ -96,8 +90,8 @@ const AdminProfile = () => {
             </div>
           </div>
           <div className="myprofile__status-badge">
-            <span className={`myprofile__badge myprofile__badge--${profileData.active ? 'active' : 'inactive'}`}>
-              {profileData.active ? 'Active' : 'Inactive'}
+            <span className="myprofile__badge myprofile__badge--active">
+              Active
             </span>
           </div>
         </div>
@@ -114,8 +108,13 @@ const AdminProfile = () => {
 
           <div className="myprofile__info-grid">
             <div className="myprofile__info-item">
-              <label className="myprofile__info-label">Full Name</label>
-              <p className="myprofile__info-value">{profileData.adminName || '-'}</p>
+              <label className="myprofile__info-label">First Name</label>
+              <p className="myprofile__info-value">{profileData.firstName || '-'}</p>
+            </div>
+
+            <div className="myprofile__info-item">
+              <label className="myprofile__info-label">Last Name</label>
+              <p className="myprofile__info-value">{profileData.lastName || '-'}</p>
             </div>
 
             <div className="myprofile__info-item">
@@ -127,37 +126,22 @@ const AdminProfile = () => {
             </div>
 
             <div className="myprofile__info-item">
-              <label className="myprofile__info-label">Phone Number</label>
-              <p className="myprofile__info-value">
-                <FiPhone size={14} style={{ marginRight: '5px' }} />
-                {profileData.phoneNumber || '-'}
-              </p>
-            </div>
-
-            <div className="myprofile__info-item">
               <label className="myprofile__info-label">Role</label>
               <p className="myprofile__info-value">
                 <FiUser size={14} style={{ marginRight: '5px' }} />
-                {profileData.role || '-'}
+                {profileData.role || 'admin'}
               </p>
             </div>
 
             <div className="myprofile__info-item">
-              <label className="myprofile__info-label">Department</label>
-              <p className="myprofile__info-value">{profileData.department || '-'}</p>
+              <label className="myprofile__info-label">Admin ID</label>
+              <p className="myprofile__info-value">{profileData.id || '-'}</p>
             </div>
 
             <div className="myprofile__info-item">
-              <label className="myprofile__info-label">Join Date</label>
-              <p className="myprofile__info-value">{profileData.joinDate || '-'}</p>
-            </div>
-
-            <div className="myprofile__info-item">
-              <label className="myprofile__info-label">Account Status</label>
+              <label className="myprofile__info-label">Registration Date</label>
               <p className="myprofile__info-value">
-                <span className={`myprofile__badge myprofile__badge--${profileData.active ? 'active' : 'inactive'}`}>
-                  {profileData.active ? 'Active' : 'Inactive'}
-                </span>
+                {profileData.timestamp ? new Date(profileData.timestamp).toLocaleDateString() : '-'}
               </p>
             </div>
           </div>

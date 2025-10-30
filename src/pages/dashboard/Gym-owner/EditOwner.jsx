@@ -9,9 +9,9 @@ const EditOwner = () => {
     gymName: 'Muscle Factory',
     ownerName: 'Rahul Sharma',
     email: 'rahul@example.com',
-    phone: '+91 9876543210',
-    uniqueId: 'GYM-2025-001',
-    status: 'Active',
+    phoneNumber: '+91 9876543210',
+    address: '123 Main Street, City',
+    active: true,
     subscriptionType: 'Monthly',
   });
 
@@ -96,7 +96,7 @@ const EditOwner = () => {
               <input
                 type="text"
                 name="gymName"
-                value={formData.gymName}
+                value={formData.gymName || ''}
                 onChange={handleChange}
                 className="editowner__input"
               />
@@ -108,7 +108,7 @@ const EditOwner = () => {
               <input
                 type="text"
                 name="ownerName"
-                value={formData.ownerName}
+                value={formData.ownerName || ''}
                 onChange={handleChange}
                 className="editowner__input"
               />
@@ -120,48 +120,47 @@ const EditOwner = () => {
               <input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={formData.email || ''}
                 onChange={handleChange}
                 className="editowner__input"
               />
             </div>
 
-            {/* Phone */}
+            {/* Phone Number */}
             <div className="editowner__form-group">
               <label className="editowner__label">Phone Number</label>
               <input
                 type="tel"
-                name="phone"
-                value={formData.phone}
+                name="phoneNumber"
+                value={formData.phoneNumber || ''}
                 onChange={handleChange}
                 className="editowner__input"
               />
             </div>
 
-            {/* Unique ID */}
-            <div className="editowner__form-group">
-              <label className="editowner__label">Unique ID</label>
-              <input
-                type="text"
-                name="uniqueId"
-                value={formData.uniqueId}
+            {/* Address */}
+            <div className="editowner__form-group editowner__form-group--fullwidth">
+              <label className="editowner__label">Address</label>
+              <textarea
+                name="address"
+                value={formData.address || ''}
                 onChange={handleChange}
                 className="editowner__input"
-                readOnly
+                rows="3"
               />
             </div>
 
-            {/* Status */}
+            {/* Active Status */}
             <div className="editowner__form-group">
               <label className="editowner__label">Status</label>
               <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
+                name="active"
+                value={formData.active ?? true}
+                onChange={(e) => handleChange({ target: { name: 'active', value: e.target.value === 'true' }})}
                 className="editowner__input"
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value={true}>Active</option>
+                <option value={false}>Inactive</option>
               </select>
             </div>
 
@@ -170,7 +169,7 @@ const EditOwner = () => {
               <label className="editowner__label">Subscription Type</label>
               <select
                 name="subscriptionType"
-                value={formData.subscriptionType}
+                value={formData.subscriptionType || 'Monthly'}
                 onChange={handleChange}
                 className="editowner__input"
               >

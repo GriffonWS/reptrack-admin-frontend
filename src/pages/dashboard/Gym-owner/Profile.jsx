@@ -38,19 +38,18 @@ const Profile = () => {
 
       // Mock data for testing
       const mockOwner = {
-        id: id,
+        gym_owner_id: id,
         gymName: 'Elite Fitness Center',
         ownerName: 'John Smith',
         email: 'john.smith@elitefitness.com',
-        phone: '+1 (555) 123-4567',
+        phoneNumber: '+1 (555) 123-4567',
         address: '123 Main Street, New York, NY 10001',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
         profileImage: null,
+        gymLogo: null,
+        uniqueId: 'GYM-2024-001',
         active: true,
-        registrationDate: '2024-01-15',
-        subscriptionType: 'Premium'
+        createdAt: '2024-01-15',
+        subscriptionType: 'Monthly'
       };
 
       setSelectedOwner(mockOwner);
@@ -144,14 +143,22 @@ const Profile = () => {
             <h1 className="profile__name">
               {selectedOwner.ownerName}
             </h1>
-            <p className="profile__member-id">Gym: {selectedOwner.gymName}</p>
+            <p className="profile__member-id">ID: {selectedOwner.uniqueId}</p>
+            <p className="profile__gym-name">Gym: {selectedOwner.gymName}</p>
             <span className={`profile__status profile__status--${selectedOwner.active ? 'active' : 'inactive'}`}>
               {selectedOwner.active ? 'Active' : 'Inactive'}
             </span>
           </div>
         </div>
+        <div className="profile__header-right">
+          {selectedOwner.gymLogo && (
+            <div className="profile__gym-logo">
+              <img src={selectedOwner.gymLogo} alt="Gym Logo" />
+            </div>
+          )}
+        </div>
         <div className="profile__header-actions">
-          <Link to={`/dashboard/all_owners/${selectedOwner.id}/edit`} className="profile__btn profile__btn--edit" style={{textDecoration:"none"}}>
+          <Link to={`/dashboard/all_owners/${selectedOwner.gym_owner_id}/edit`} className="profile__btn profile__btn--edit" style={{textDecoration:"none"}}>
             <FiEdit size={18} />
             Edit
           </Link>
@@ -172,7 +179,7 @@ const Profile = () => {
             </div>
             <div className="profile__info-content">
               <label className="profile__info-label">Phone Number</label>
-              <p className="profile__info-value">{selectedOwner.phone || '—'}</p>
+              <p className="profile__info-value">{selectedOwner.phoneNumber || '—'}</p>
             </div>
           </div>
           <div className="profile__info-item">
@@ -184,22 +191,6 @@ const Profile = () => {
               <p className="profile__info-value">{selectedOwner.email || '—'}</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Gym Details */}
-      <div className="profile__section">
-        <h3 className="profile__section-title">Gym Details</h3>
-        <div className="profile__info-grid">
-          <div className="profile__info-item">
-            <div className="profile__info-icon">
-              <FiUser size={20} />
-            </div>
-            <div className="profile__info-content">
-              <label className="profile__info-label">Gym Name</label>
-              <p className="profile__info-value">{selectedOwner.gymName || '—'}</p>
-            </div>
-          </div>
           <div className="profile__info-item">
             <div className="profile__info-icon">
               <FiMapPin size={20} />
@@ -207,33 +198,6 @@ const Profile = () => {
             <div className="profile__info-content">
               <label className="profile__info-label">Address</label>
               <p className="profile__info-value">{selectedOwner.address || '—'}</p>
-            </div>
-          </div>
-          <div className="profile__info-item">
-            <div className="profile__info-icon">
-              <FiMapPin size={20} />
-            </div>
-            <div className="profile__info-content">
-              <label className="profile__info-label">City</label>
-              <p className="profile__info-value">{selectedOwner.city || '—'}</p>
-            </div>
-          </div>
-          <div className="profile__info-item">
-            <div className="profile__info-icon">
-              <FiMapPin size={20} />
-            </div>
-            <div className="profile__info-content">
-              <label className="profile__info-label">State</label>
-              <p className="profile__info-value">{selectedOwner.state || '—'}</p>
-            </div>
-          </div>
-          <div className="profile__info-item">
-            <div className="profile__info-icon">
-              <FiMapPin size={20} />
-            </div>
-            <div className="profile__info-content">
-              <label className="profile__info-label">Zip Code</label>
-              <p className="profile__info-value">{selectedOwner.zipCode || '—'}</p>
             </div>
           </div>
         </div>
@@ -258,7 +222,7 @@ const Profile = () => {
             </div>
             <div className="profile__info-content">
               <label className="profile__info-label">Registration Date</label>
-              <p className="profile__info-value">{selectedOwner.registrationDate || '—'}</p>
+              <p className="profile__info-value">{selectedOwner.createdAt ? new Date(selectedOwner.createdAt).toLocaleDateString() : '—'}</p>
             </div>
           </div>
         </div>

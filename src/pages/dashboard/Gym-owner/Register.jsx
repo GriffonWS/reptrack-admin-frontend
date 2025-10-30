@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
 import { FiUpload, FiArrowLeft } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../Gym-owner/Register.css';
+import { registerGymOwner } from '../../../services/gymOwner/gymOwnerService';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     gymName: '',
     ownerName: '',
     email: '',
-    phone: '',
-    uniqueId: '',
-    status: '',
-    subscriptionType: ''
+    phoneNumber: '',
+    address: '',
+    subscriptionType: '',
+    password: ''
   });
 
   const [profileImage, setProfileImage] = useState(null);
   const [gymLogo, setGymLogo] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   // Handle text inputs
   const handleChange = (e) => {
@@ -41,10 +46,10 @@ const Register = () => {
       gymName: '',
       ownerName: '',
       email: '',
-      phone: '',
-      uniqueId: '',
-      status: '',
-      subscriptionType: ''
+      phoneNumber: '',
+      address: '',
+      subscriptionType: '',
+      password: ''
     });
     setProfileImage(null);
     setGymLogo(null);
@@ -52,9 +57,59 @@ const Register = () => {
     setLogoPreview(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      // Validate required fields
+      if (!formData.gymName || !formData.ownerName || !formData.email ||
+          !formData.phoneNumber || !formData.address || !formData.subscriptionType ||
+          !formData.password) {
+        setError('Please fill in all required fields');
+        setLoading(false);
+        return;
+      }
+
+      // Create FormData object
+      const formDataToSend = new FormData();
+      formDataToSend.append('gymName', formData.gymName);
+      formDataToSend.append('ownerName', formData.ownerName);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phoneNumber', formData.phoneNumber);
+      formDataToSend.append('address', formData.address);
+      formDataToSend.append('subscriptionType', formData.subscriptionType);
+      formDataToSend.append('password', formData.password);
+
+      // Append images if they exist
+      if (profileImage) {
+        formDataToSend.append('profile_image', profileImage);
+      }
+      if (gymLogo) {
+        formDataToSend.append('gym_logo', gymLogo);
+      }
+
+      // Call API to register gym owner
+      const response = await registerGymOwner(formDataToSend);
+
+      if (response.success) {
+        setSuccess('Gym owner registered successfully!');
+
+        // Reset form after successful registration
+        setTimeout(() => {
+          navigate('/dashboard/all_owners');
+        }, 2000);
+      } else {
+        setError(response.message || 'Failed to register gym owner');
+      }
+    } catch (err) {
+      console.error('Error registering gym owner:', err);
+      setError(err.message || 'Failed to register gym owner');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,6 +126,19 @@ const Register = () => {
           <h1 className="adduser__title">Add Gym Owner</h1>
           <p className="adduser__subtitle">Fill in the details to register a new gym</p>
         </div>
+
+        {/* Error & Success Messages */}
+        {error && (
+          <div className="adduser__error-message">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="adduser__success-message">
+            {success}
+          </div>
+        )}
 
         {/* Form */}
         <div className="adduser__form-container">
@@ -122,7 +190,7 @@ const Register = () => {
 
               {/* Gym Name */}
               <div className="adduser__form-group">
-                <label className="adduser__label">Gym Name</label>
+                <label className="adduser__label">Gym Name *</label>
                 <input
                   type="text"
                   name="gymName"
@@ -130,12 +198,13 @@ const Register = () => {
                   value={formData.gymName}
                   onChange={handleChange}
                   className="adduser__input"
+                  required
                 />
               </div>
 
               {/* Owner Name */}
               <div className="adduser__form-group">
-                <label className="adduser__label">Owner Name</label>
+                <label className="adduser__label">Owner Name *</label>
                 <input
                   type="text"
                   name="ownerName"
@@ -143,12 +212,13 @@ const Register = () => {
                   value={formData.ownerName}
                   onChange={handleChange}
                   className="adduser__input"
+                  required
                 />
               </div>
 
               {/* Email */}
               <div className="adduser__form-group">
-                <label className="adduser__label">Email</label>
+                <label className="adduser__label">Email *</label>
                 <input
                   type="email"
                   name="email"
@@ -156,64 +226,67 @@ const Register = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="adduser__input"
+                  required
                 />
               </div>
 
               {/* Phone Number */}
               <div className="adduser__form-group">
-                <label className="adduser__label">Phone Number</label>
+                <label className="adduser__label">Phone Number *</label>
                 <input
                   type="tel"
-                  name="phone"
+                  name="phoneNumber"
                   placeholder="Enter phone number"
-                  value={formData.phone}
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                   className="adduser__input"
+                  required
                 />
               </div>
 
-              {/* Unique ID */}
-              <div className="adduser__form-group">
-                <label className="adduser__label">Unique ID</label>
-                <input
-                  type="text"
-                  name="uniqueId"
-                  placeholder="Enter unique ID"
-                  value={formData.uniqueId}
+              {/* Address */}
+              <div className="adduser__form-group adduser__form-group--fullwidth">
+                <label className="adduser__label">Address *</label>
+                <textarea
+                  name="address"
+                  placeholder="Enter gym address"
+                  value={formData.address}
                   onChange={handleChange}
                   className="adduser__input"
+                  rows="3"
+                  required
                 />
-              </div>
-
-              {/* Status */}
-              <div className="adduser__form-group">
-                <label className="adduser__label">Status</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="adduser__input"
-                >
-                  <option value="">Select status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
               </div>
 
               {/* Subscription Type */}
               <div className="adduser__form-group">
-                <label className="adduser__label">Subscription Type</label>
+                <label className="adduser__label">Subscription Type *</label>
                 <select
                   name="subscriptionType"
                   value={formData.subscriptionType}
                   onChange={handleChange}
                   className="adduser__input"
+                  required
                 >
                   <option value="">Select subscription</option>
                   <option value="Monthly">Monthly</option>
                   <option value="Quarterly">Quarterly</option>
                   <option value="Yearly">Yearly</option>
                 </select>
+              </div>
+
+              {/* Password */}
+              <div className="adduser__form-group">
+                <label className="adduser__label">Password *</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="adduser__input"
+                  required
+                />
               </div>
             </div>
 
@@ -223,14 +296,16 @@ const Register = () => {
                 type="button"
                 onClick={handleReset}
                 className="adduser__btn adduser__btn--secondary"
+                disabled={loading}
               >
                 Reset
               </button>
               <button
                 type="submit"
                 className="adduser__btn adduser__btn--primary"
+                disabled={loading}
               >
-                Add Gym
+                {loading ? 'Registering...' : 'Add Gym'}
               </button>
             </div>
           </form>
