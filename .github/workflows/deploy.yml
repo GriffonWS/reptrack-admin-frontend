@@ -1,13 +1,13 @@
-name: Deploy Admin Frontend to EC2
+name: Deploy Frontend to EC2
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger deployment only on push to main branch
 
 jobs:
   deploy:
-    name: Deploy Admin Frontend to AWS EC2
+    name: Deploy Frontend to AWS EC2
     runs-on: ubuntu-latest
 
     steps:
@@ -21,13 +21,6 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Check if directory exists, if not clone it
-            if [ ! -d "/home/ubuntu/reptrack-admin-frontend" ]; then
-              echo "📁 Directory doesn't exist. Cloning repository..."
-              cd /home/ubuntu
-              git clone https://github.com/GriffonWS/reptrack-admin-frontend.git
-            fi
-
             cd /home/ubuntu/reptrack-admin-frontend
 
             # Stash any local changes (like .env modifications)
@@ -42,13 +35,13 @@ jobs:
             # Install dependencies
             npm install
 
-            # Build admin frontend
+            # Build frontend
             npm run build
 
             # Test and reload nginx
             sudo nginx -t && sudo systemctl reload nginx
 
-            echo "✅ Admin Frontend deployment completed!"
+            echo "✅ Frontend deployment completed!"
             echo "📊 Latest commit:"
             git log -1 --oneline
 
