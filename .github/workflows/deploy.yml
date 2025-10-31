@@ -7,44 +7,42 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Admin Frontend to AWS EC2 (Port 3001)
+    name: Build and Deploy Admin Frontend to AWS EC2 (Port 3001)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to EC2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build admin frontend
+        run: npm run build
+
+      - name: Deploy to EC2 via rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: dist/
+          remote_path: /home/ubuntu/reptrack-admin-frontend/dist/
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Reload Nginx
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/reptrack-admin-frontend
-
-            # Stash any local changes (like .env modifications)
-            git stash
-
-            # Pull latest code
-            git pull origin main
-
-            # Restore stashed .env if it exists
-            git stash pop || true
-
-            # Install dependencies
-            npm install
-
-            # Build admin frontend
-            npm run build
-
-            # Restart PM2 process for admin (serves on port 3001)
-            pm2 restart reptrack-admin
-            pm2 save
-
-            echo "✅ Admin frontend deployment completed!"
-            echo "📊 Latest commit:"
-            git log -1 --oneline
-
-            echo "📊 PM2 status:"
-            pm2 status reptrack-admin
+            echo "✅ Admin frontend deployed via rsync!"
+            sudo nginx -t && sudo systemctl reload nginx
+            echo "📊 Nginx status:"
+            sudo systemctl status nginx --no-pager | head -5
