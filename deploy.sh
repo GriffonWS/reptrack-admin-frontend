@@ -8,7 +8,7 @@ set -e  # Exit on error
 echo "🚀 Starting frontend deployment..."
 
 # Navigate to project directory
-cd /home/ubuntu/reptrack-admi-frontend
+cd /home/ubuntu/reptrack-admin-frontend
 
 # Pull latest changes from GitHub
 echo "📥 Pulling latest code from GitHub..."
