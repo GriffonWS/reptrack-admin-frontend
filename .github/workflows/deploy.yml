@@ -3,7 +3,7 @@ name: Deploy Admin Frontend to EC2
 on:
   push:
     branches:
-      - main  # Trigger deployment only on push to main branch
+      - main
 
 jobs:
   deploy:
@@ -21,6 +21,13 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Check if directory exists, if not clone it
+            if [ ! -d "/home/ubuntu/reptrack-admin-frontend" ]; then
+              echo "📁 Directory doesn't exist. Cloning repository..."
+              cd /home/ubuntu
+              git clone https://github.com/YOUR_USERNAME/reptrack-admin-frontend.git
+            fi
+
             cd /home/ubuntu/reptrack-admin-frontend
 
             # Stash any local changes (like .env modifications)
