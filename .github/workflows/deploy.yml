@@ -25,7 +25,7 @@ jobs:
             if [ ! -d "/home/ubuntu/reptrack-admin-frontend" ]; then
               echo "📁 Directory doesn't exist. Cloning repository..."
               cd /home/ubuntu
-              git clone https://github.com/YOUR_USERNAME/reptrack-admin-frontend.git
+              git clone https://github.com/GriffonWS/reptrack-admin-frontend.git
             fi
 
             cd /home/ubuntu/reptrack-admin-frontend
