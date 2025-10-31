@@ -222,6 +222,27 @@
   cursor: not-allowed;
 }
 
+/* ==================== ERROR & SUCCESS MESSAGES ==================== */
+.editowner__error-message {
+  padding: 1rem 1.5rem;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  color: #c33;
+  font-size: 0.9375rem;
+  margin: 0 2rem 1.5rem 2rem;
+}
+
+.editowner__success-message {
+  padding: 1rem 1.5rem;
+  background-color: #efe;
+  border: 1px solid #cfc;
+  border-radius: 8px;
+  color: #3c3;
+  font-size: 0.9375rem;
+  margin: 0 2rem 1.5rem 2rem;
+}
+
 .editowner__btn--secondary {
   background-color: transparent;
   color: var(--text-dark);

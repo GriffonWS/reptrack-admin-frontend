@@ -11,6 +11,7 @@ import {
 import './Profile.css';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Loader from '../../../components/Loader/Loader';
+import { getGymOwnerById, deleteGymOwner } from '../../../services/gymOwner/gymOwnerService';
 
 const Profile = () => {
   const { id } = useParams();
@@ -30,29 +31,15 @@ const Profile = () => {
       setIsLoading(true);
       setError('');
 
-      // TODO: Replace with actual API call to fetch gym owner details
-      // const response = await getGymOwnerDetails(id);
+      console.log('Fetching gym owner with ID:', id);
+      const response = await getGymOwnerById(id);
+      console.log('Response received:', response);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock data for testing
-      const mockOwner = {
-        gym_owner_id: id,
-        gymName: 'Elite Fitness Center',
-        ownerName: 'John Smith',
-        email: 'john.smith@elitefitness.com',
-        phoneNumber: '+1 (555) 123-4567',
-        address: '123 Main Street, New York, NY 10001',
-        profileImage: null,
-        gymLogo: null,
-        uniqueId: 'GYM-2024-001',
-        active: true,
-        createdAt: '2024-01-15',
-        subscriptionType: 'Monthly'
-      };
-
-      setSelectedOwner(mockOwner);
+      if (response.success && response.data) {
+        setSelectedOwner(response.data);
+      } else {
+        setError(response.message || 'Failed to fetch gym owner details');
+      }
     } catch (err) {
       setError(err.message || 'Failed to fetch gym owner details');
       console.error('Error fetching gym owner details:', err);
@@ -77,13 +64,14 @@ const Profile = () => {
     try {
       setIsLoading(true);
 
-      // TODO: Replace with actual API call to delete gym owner
-      // const response = await deleteGymOwner(selectedOwner.id);
+      const response = await deleteGymOwner(selectedOwner.id);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      alert('Gym owner deleted successfully');
-      navigate('/dashboard/all_owners');
+      if (response.success) {
+        alert('Gym owner deleted successfully');
+        navigate('/dashboard/all_owners');
+      } else {
+        alert(response.message || 'Failed to delete gym owner');
+      }
     } catch (err) {
       alert(err.message || 'Failed to delete gym owner');
       console.error('Error deleting gym owner:', err);
@@ -145,9 +133,6 @@ const Profile = () => {
             </h1>
             <p className="profile__member-id">ID: {selectedOwner.uniqueId}</p>
             <p className="profile__gym-name">Gym: {selectedOwner.gymName}</p>
-            <span className={`profile__status profile__status--${selectedOwner.active ? 'active' : 'inactive'}`}>
-              {selectedOwner.active ? 'Active' : 'Inactive'}
-            </span>
           </div>
         </div>
         <div className="profile__header-right">
@@ -158,7 +143,7 @@ const Profile = () => {
           )}
         </div>
         <div className="profile__header-actions">
-          <Link to={`/dashboard/all_owners/${selectedOwner.gym_owner_id}/edit`} className="profile__btn profile__btn--edit" style={{textDecoration:"none"}}>
+          <Link to={`/dashboard/all_owners/${selectedOwner.id}/edit`} className="profile__btn profile__btn--edit" style={{textDecoration:"none"}}>
             <FiEdit size={18} />
             Edit
           </Link>
@@ -223,6 +208,19 @@ const Profile = () => {
             <div className="profile__info-content">
               <label className="profile__info-label">Registration Date</label>
               <p className="profile__info-value">{selectedOwner.createdAt ? new Date(selectedOwner.createdAt).toLocaleDateString() : '—'}</p>
+            </div>
+          </div>
+          <div className="profile__info-item">
+            <div className="profile__info-icon">
+              <FiUser size={20} />
+            </div>
+            <div className="profile__info-content">
+              <label className="profile__info-label">Account Status</label>
+              <p className="profile__info-value">
+                <span className={`profile__status profile__status--${selectedOwner.active ? 'active' : 'inactive'}`}>
+                  {selectedOwner.active ? 'Active' : 'Inactive'}
+                </span>
+              </p>
             </div>
           </div>
         </div>

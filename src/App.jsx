@@ -13,6 +13,9 @@ import AdminProfile from './pages/dashboard/profile/AdminProfile';
 import EditAdminProfile from './pages/dashboard/profile/EditAdminProfile';
 import Login from './pages/auth/adminLogin';
 import RegisterAdmin from './pages/auth/adminRegister';
+import Health from './pages/dashboard/Health/Health';
+import PrivacyPolicy from './pages/dashboard/PrivacyPolicy/PrivacyPolicy';
+import Support from './pages/dashboard/Support/Support';
 
 
 
@@ -41,8 +44,9 @@ const App = () => {
         <Route path="all_owners/:id/edit" element={<EditOwner />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="profile/edit" element={<EditAdminProfile />} />
-
-
+        <Route path="health" element={<Health />} />
+        <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="support" element={<Support />} />
       </Route>
     </Routes>
   );

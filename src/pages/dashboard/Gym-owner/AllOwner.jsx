@@ -43,16 +43,23 @@ const AllOwner = () => {
     }
   };
 
-  // Filter search
-  const filteredOwners = owners.filter((owner) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      owner.ownerName?.toLowerCase().includes(searchLower) ||
-      owner.email?.toLowerCase().includes(searchLower) ||
-      owner.gymName?.toLowerCase().includes(searchLower) ||
-      owner.uniqueId?.toLowerCase().includes(searchLower)
-    );
-  });
+  // Filter search and sort by creation date (most recent first)
+  const filteredOwners = owners
+    .filter((owner) => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        owner.ownerName?.toLowerCase().includes(searchLower) ||
+        owner.email?.toLowerCase().includes(searchLower) ||
+        owner.gymName?.toLowerCase().includes(searchLower) ||
+        owner.uniqueId?.toLowerCase().includes(searchLower)
+      );
+    })
+    .sort((a, b) => {
+      // Sort by createdAt or timestamp in descending order (newest first)
+      const dateA = new Date(a.createdAt || a.timestamp || 0);
+      const dateB = new Date(b.createdAt || b.timestamp || 0);
+      return dateB - dateA;
+    });
 
   const totalOwners = filteredOwners.length;
   const totalPages = Math.ceil(totalOwners / itemsPerPage);
@@ -146,7 +153,7 @@ const AllOwner = () => {
                   </tr>
                 ) : (
                   paginatedOwners.map((owner, index) => (
-                    <tr key={owner.gym_owner_id}>
+                    <tr key={owner.id}>
                       <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                       <td>
                         <div className="users__name-cell">
@@ -169,7 +176,7 @@ const AllOwner = () => {
                       </td>
                       <td>
                         <Link
-                          to={`/dashboard/all_owners/${owner.gym_owner_id}`}
+                          to={`/dashboard/all_owners/${owner.id}`}
                           className="users__action-btn"
                           style={{ textDecoration: 'none' }}
                         >
@@ -192,7 +199,7 @@ const AllOwner = () => {
               </div>
             ) : (
               paginatedOwners.map((owner) => (
-                <div key={owner.gym_owner_id} className="users__card">
+                <div key={owner.id} className="users__card">
                   <div className="users__card-header">
                     <div className="users__card-info">
                       <div className="users__avatar">
@@ -222,7 +229,7 @@ const AllOwner = () => {
                     </div>
                   </div>
 
-                  <Link to={`/dashboard/all_owners/${owner.gym_owner_id}`} className="users__card-btn" style={{textDecoration:"none"}}>
+                  <Link to={`/dashboard/all_owners/${owner.id}`} className="users__card-btn" style={{textDecoration:"none"}}>
                     <AiOutlineEye size={16} />
                     View Profile
                   </Link>

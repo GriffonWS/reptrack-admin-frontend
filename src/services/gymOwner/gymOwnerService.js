@@ -14,7 +14,7 @@ export const getAllGymOwners = async () => {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${API_URL}/gym-owner/all`, {
+    const response = await fetch(`${API_URL}/gym-owner/get/all`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const getGymOwnerById = async (id) => {
       throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${API_URL}/gym-owner/${id}`, {
+    const response = await fetch(`${API_URL}/gym-owner/get-by/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
